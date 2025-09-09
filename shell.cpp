@@ -136,18 +136,16 @@ vector<int> execute_cmd(vector<char*>& tokens){
     const char* prev_tok="";
     for(int i=1;i<=tokens.size();i++) {
     if(strcmp(prev_tok, "<")==0){
-        //cout<<token<<endl;
+        
         fd0 =open(token,O_RDONLY);
         if(fd0<0){perror("Given file not found");}
-        //dup2(fd0,STDIN_FILENO);
-        //close(fd0);
+        
     }
     if(strcmp(prev_tok, ">")==0){
-        //cout<<token<<endl;
+        
         fd1 =open(token,O_WRONLY | O_CREAT,0644);
         if(fd1<0){perror("Open failed");}
-        //dup2(fd1,STDOUT_FILENO);
-        //close(fd1);
+        
     }
     if(strcmp(prev_tok, ">>")==0){
         fd1 =open(token,O_WRONLY | O_CREAT | O_APPEND,0644);
@@ -162,12 +160,7 @@ vector<int> execute_cmd(vector<char*>& tokens){
 
    fds.push_back(fd0);
    fds.push_back(fd1);
-    /*else{
-
-        tokenz.push_back(nullptr);
-        int e=execvp(tokenz[0],tokenz.data());
-        if(e==-1) perror("command not found");
-    }*/
+    
     tokens=tokenz;
     return fds;       
 }
@@ -178,14 +171,14 @@ int exec_inbuilt(vector<char *> tokens){
 
                 exit(1);}
             if(strcmp(tokens[0], "cd")==0){
-            //cout<<"here"<<endl;
+            
             string path;
             
             if (tokens.size()==1) {
                 path = getenv("HOME");
             }
             else if(tokens.size()==2) {
-                //cout<<(strcmp(tokens[1], "-"))<<endl;
+                
                 if(strcmp(tokens[1], "~")==0){
                     path = getenv("HOME");
                 }
@@ -199,7 +192,7 @@ int exec_inbuilt(vector<char *> tokens){
                 cout<<"Invalid Arguments";
                 return 0;
             }
-            //cout<<"change to:"<<path<<endl;
+           
             if(chdir(path.c_str())!=0) perror("cd error");
             else{
             //cout<<path<<endl;
@@ -290,7 +283,7 @@ int exec_inbuilt(vector<char *> tokens){
                 perror("stat");
                 return 0;
             }
-            //if (S_ISDIR(st.st_mode)) {
+            
             string search_res="False";
                 
             DIR *d = opendir(".");
@@ -301,14 +294,14 @@ int exec_inbuilt(vector<char *> tokens){
             }
             cout<<search_res<<endl;
             closedir(d);
-            //} 
+            
         }
         else if( strcmp(tokens[0], "ls") == 0){
-            //getcwd(cwd,sizeof(cwd));
+          
             int flags[2]={0,0};
             vector<string>dir;
             for(int i=1;i<tokens.size();i++){
-                //cout<<"hiya"<<endl;
+               
                 if(strcmp(tokens[i],"-a")==0) flags[0]=1;
                 else if(strcmp(tokens[i],"-l")==0) flags[1]=1;
                 else if(strcmp(tokens[i],"-al")==0 || (strcmp(tokens[i],"-la")==0)) {flags[0]=1;flags[1]=1;}
@@ -317,10 +310,10 @@ int exec_inbuilt(vector<char *> tokens){
                     dir.push_back(tokens[i]);  
                 }
             }
-            //cout<<"hiya2"<<endl;
+            
             if (dir.empty()) dir.push_back(".");
             for (int i = 0; i < dir.size(); i++) {
-                //cout<<dir[i]<<endl;
+               
                 struct stat st;
                 if (stat(dir[i].c_str(), &st) == -1) {
                     perror("stat");
@@ -368,17 +361,13 @@ int main() {
     signal(SIGTTIN, SIG_IGN);   
     signal(SIGTTOU, SIG_IGN);   
     signal(SIGCHLD, SIG_DFL); 
+    
     rl_attempted_completion_function = my_completion;
     
-    //read_history(".shell_his");
-    //stifle_history(20);
-    
-
     char *hostname; size_t len;
     struct utsname buf;
     int e = uname(&buf);
     hostname=buf.nodename;
-    //gethostname(name, len);
     if(e==-1){
         perror("host name error");
     }
@@ -410,8 +399,7 @@ int main() {
         if (!input) break; 
 
         if (*input) {
-            //int his_fd=open("shell_his.txt",O_WRONLY,0644);
-            //write(his_fd,input,sizeof(input));
+            
             add_history(input);
             append_history(1,path_his);
             history_truncate_file(path_his,20);
@@ -467,8 +455,7 @@ int main() {
             f= exec_inbuilt(tokens);
             dup2(saved_stdin, STDIN_FILENO);
             dup2(saved_stdout, STDOUT_FILENO);
-            //close(saved_stdin);
-            //close(saved_stdout);
+           
             if(f){
             pid_t pid = fork();
             int status,fore_flag=1;
@@ -532,9 +519,7 @@ int main() {
                         in_fd=fds[1];
                         close(fds[1]);
                     }
-                    //tokens.push_back(nullptr);
-                    //int e=execvp(tokens[0],tokens.data());
-                    //if(e==-1) perror("command not found");
+                   
                     if (in_fd != 0) {
                         dup2(in_fd, 0); 
                         close(in_fd);
